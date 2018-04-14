@@ -2,8 +2,9 @@ import express from 'express';
 
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import rest_api from  './apiFiles/rest'; // import external file for more routes
 
-import Database from './apiFiles/DatabaseExample';
+import db from './apiFiles/db';
 
 let app = express();
 
@@ -17,31 +18,21 @@ app.listen(port, () => {
     console.log('running on port: ' + port);
 });
 
-
-//runs the Db Example from apiFiles/DatabaseExample
-Database.DataBaseExample();
+db.connect();
 
 
 const router = express.Router();
 
-app.use('/api', router);
+app.use('/rest', router);
 
 //middleware function (gets called before any route)
 app.use(function (req, res, next) {
-    console.log('Time:', Date.now());
+    var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+    console.log('Time:', Date.now(), fullUrl);
     next()
 });
 
-//basic get request for localhost:[port]/api/pathname
-router.route('/pathname').get((req, res, next) => {
-    res.send('Get Request');
-});
-//basic post request
-router.route('/pathname').post((req, res, next) => {
-    res.send('Post Request');
-});
-import api1 from  './apiFiles/apiFile1'; // import external file for more routes
-api1(app, router); //pass app and router to external routes
+rest_api(app, router); //pass app and router to external routes
 
 
 //"npm run dev" in command line to start
