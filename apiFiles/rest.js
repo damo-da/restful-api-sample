@@ -70,4 +70,50 @@ export default (app, router) => {
 
     });
 
+    router.route('/emr/:id').delete((req, res) => {
+        const _id = req.params.id;
+        db.models.EMR.find({_id}).exec((err, result) => {
+            if(err){
+                console.log('error: ', err);
+                res.status(400);
+                return res.send("Something wrong.");
+            }
+            console.log("Results", result.length, result);
+            if (result.length == 0 ){
+                res.status(400);
+                return res.send("Cannot find id");
+            }
+            result[0].remove();
+
+            return res.send("Success.");
+        });
+
+    });
+
+    router.route('/emr/:id').put((req, res) => {
+        const _id = req.params.id;
+
+        db.models.EMR.find({_id}).exec((err, result) => {
+            if(err){
+                console.log('error: ', err);
+                res.status(400);
+                return res.send("Something wrong.");
+            }
+            if(result.length === 0){
+                return res.status(404).send('Not found.');
+            }else{
+
+                result[0].name = req.body.name;
+                result[0].address = req.body.address;
+                result[0].medications = req.body.medications;
+                result[0].birhdate = req.body.birthdate;
+                result[0].provider = req.body.provider;
+
+                result[0].save();
+                return res.send("Success");
+            }
+        });
+
+    });
+
 }
